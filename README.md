@@ -1,3 +1,2 @@
-### HS-Fulda SoSe '17 
-#### University of Applied Sciences
-##### Distributed Databases lab exercises 
+### HS-Fulda University of Applied Sciences 
+##### Distributed Databases lab exercises | SoSe '17 
