@@ -1,0 +1,28 @@
+-- Distributed Databases - Assignment 02
+-- HS-Fulda SoSe 17
+-- @author  Manasés Jesús
+
+
+-- 1. Create a table with the specified columns and constraints
+
+DROP TABLE R1K;
+
+CREATE TABLE R1K (
+  PK       NUMBER GENERATED ALWAYS as IDENTITY(START with 1 INCREMENT by 1),
+  CK1      NUMBER GENERATED ALWAYS as IDENTITY(),
+  FK       NUMBER NOT NULL,
+  FIBO     NUMBER,
+  GV100    NUMBER(3),
+  GV10000  NUMBER(5),
+  UV30     NUMBER(2),
+  LV1000   NUMBER(4),
+  STADT100 VARCHAR2(256),
+  DAT100   DATE DEFAULT SYSDATE,
+
+  CONSTRAINT pk_pk PRIMARY KEY (PK),
+  CONSTRAINT fk_refers_pk FOREIGN KEY (FK) REFERENCES R1K (PK),
+  CONSTRAINT gv100_below_100 CHECK (GV100 < 100),
+  CONSTRAINT gv10000_below_10000 CHECK (GV10000 < 10000),
+  CONSTRAINT uv30_below_30 CHECK (UV30 < 30),
+  CONSTRAINT lv1000_below_1000 CHECK (LV1000 < 1000)
+);
