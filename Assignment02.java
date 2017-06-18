@@ -141,7 +141,7 @@ public class Assignment02 {
     /** Load a SQL file and create a table with the specified name
      * */
     private void createTable (String name) throws SQLException, IOException {
-        List<String> lines = Files.readAllLines(Paths.get("./src/assignment02.sql"), Charset.defaultCharset());
+        List<String> lines = Files.readAllLines(Paths.get("./sql/assignment02.sql"), Charset.defaultCharset());
         String all = "";
 
         for (String line : lines) {
