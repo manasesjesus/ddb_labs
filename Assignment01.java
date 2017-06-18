@@ -37,9 +37,6 @@ public class Assignment01 {
         boolean doSQL = true;
 
         try {
-            // Register driver
-            DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
-
             // Open connection (R01, R02)
             connection = DriverManager.getConnection(URL, USER_LAB, PASSWD_LAB);
             connection.setAutoCommit(false);
@@ -97,18 +94,16 @@ public class Assignment01 {
                 stmt.executeUpdate("INSERT INTO BOOKING VALUES (30, 'AM', 777, 'GDL', 'FRA', SYSDATE+30, 1234, 1200)");
                 stmt.executeUpdate("INSERT INTO BOOKING VALUES (30, 'AM', 123, 'FRA', 'GDL', SYSDATE+30, 1234, 1000)");
                 System.out.println("Bookings registered successfully!");
-            }
 
 
+                /******* 6. Make a booking from "your" first airport via FRA to JFK.
+                 *          The day of the booking is today plus 40 days *******/
 
-            /******* 6. Make a booking from "your" first airport via FRA to JFK.
-             *          The day of the booking is today plus 40 days *******/
-            if (executeQuery("*", "BOOKING", "ALC = 'AM'")) {
-                SQL = "INSERT INTO BOOKING VALUES (30, 'AM', 777, 'GDL', 'FRA', SYSDATE+40, 1234, 1200)";
-                stmt.executeUpdate(SQL);
-                SQL = "INSERT INTO BOOKING VALUES (30, 'DL', 9, 'FRA', 'JFK', SYSDATE+40, 3900, 2000)";
-                stmt.executeUpdate(SQL);
-                System.out.println("Bookings registered successfully!");
+                    SQL = "INSERT INTO BOOKING VALUES (30, 'AM', 777, 'GDL', 'FRA', SYSDATE+40, 1234, 1200)";
+                    stmt.executeUpdate(SQL);
+                    SQL = "INSERT INTO BOOKING VALUES (30, 'DL', 9, 'FRA', 'JFK', SYSDATE+40, 3900, 2000)";
+                    stmt.executeUpdate(SQL);
+                    System.out.println("Bookings registered successfully!");
             }
 
 
@@ -186,3 +181,4 @@ public class Assignment01 {
     }
 
 }
+
