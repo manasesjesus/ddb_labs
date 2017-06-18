@@ -1,3 +1,7 @@
+-- Distributed Databases - Assignment 02
+-- HS-Fulda SoSe 17
+-- @author  Manasés Jesús (;
+
 -- VALID INSERTS
 
 INSERT INTO R1K (CK1, FK, FIBO, GV100, GV10000, UV30, LV1000, STADT100, DAT100)
