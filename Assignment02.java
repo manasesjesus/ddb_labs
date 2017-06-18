@@ -56,8 +56,8 @@ public class Assignment02 {
             Map<String, Integer> tables = new HashMap<>();
 
             tables.put("R1K", 1000);
-            //tables.put("R10K", 10000);
-            //tables.put("R100K", 100000);
+            tables.put("R10K", 10000);
+            tables.put("R100K", 100000);
 
             for (String table : tables.keySet()) {
                 createTable(table);
