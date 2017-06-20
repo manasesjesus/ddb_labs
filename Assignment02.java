@@ -42,7 +42,6 @@ public class Assignment02 {
             // Establish connection
             connection = DriverManager.getConnection(URL, USER, PASSWD);
             connection.setAutoCommit(false);
-            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 
             // Prepare statement
             stmt = connection.createStatement();
@@ -141,7 +140,7 @@ public class Assignment02 {
     /** Load a SQL file and create a table with the specified name
      * */
     private void createTable (String name) throws SQLException, IOException {
-        List<String> lines = Files.readAllLines(Paths.get("./sql/assignment02.sql"), Charset.defaultCharset());
+        List<String> lines = Files.readAllLines(Paths.get("./src/assignment02.sql"), Charset.defaultCharset());
         String all = "";
 
         for (String line : lines) {
@@ -149,8 +148,8 @@ public class Assignment02 {
         }
 
         String SQLs[] = all.replaceAll("R1K", name).split(";");
-        stmt.executeUpdate(SQLs[1]);
-        stmt.executeUpdate(SQLs[2]);
+        stmt.executeUpdate(SQLs[1]);        // TODO: Drop table if exist
+        stmt.executeUpdate(SQLs[2]);        // Create table
 
         System.out.print("\nTable " + name + " created. ");
     }
@@ -239,14 +238,18 @@ public class Assignment02 {
         System.out.println("\nIt took " + (System.currentTimeMillis() - startTime) + "ms to insert " + total + " tuples");
     }
 
-    /** Fibonacci method with integers
+    /** Fibonacci method  (iterative)
      * */
     private int iFibonacci (int n) {
-        if (n == 0 || n == 1) {
-            return n;
-        } else {
-            return iFibonacci(n - 1) + iFibonacci(n - 2);
+        int x = 0;
+
+        for (int i=0, y=1, z=1; i<n; i++) {
+            x = y;
+            y = z;
+            z = x + y;
         }
+        return x;
     }
 }
+
 
