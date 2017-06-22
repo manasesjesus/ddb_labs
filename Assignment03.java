@@ -1,71 +1,118 @@
 /**
- * Distributed Databases - Assignment 02
+ * Distributed Databases - Assignment 03
  * HS-Fulda SoSe '17
  *
  * @author  Manasés Jesús
  */
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
+import java.util.*;
 
 public class Assignment03 {
-    /* Database objects and credentials */
-    private final String URL      = "jdbc:oracle:thin:@mtsthelens.informatik.hs-fulda.de:1521:oralv9a";
-    private final String USER     = "VDBSA15";
-    private final String PASSWD   = "VDBSA15";
 
-    private final String USER_LAB     = "PROJA14";
-    private final String PASSWD_LAB   = "ASSIGN4";
-
-    private Connection connection = null;
-    private Statement stmt = null;
-
+    private static final String URL     = "jdbc:oracle:thin:@__server__.hs-fulda.de:1521:__db-name__";
+    private static final String USER    = "__REPLACE__";
+    private static final String PASSWD  = "__REPLACE__";
 
     public static void main (String[] args) {
-        new Assignment02().performTasks();
+        new Assignment03().performTasks();
     }
 
     /** Perform all DB tasks
      * */
     protected void performTasks () {
+        Connection connection = null;
+        Statement stmt = null;
         ResultSet rs = null;
-        String SQL = "";
-        String column = "";
+        long startTime = 0;
 
-        System.out.println("Establishing DB connection...");
         try {
-            // Establish connection
             connection = DriverManager.getConnection(URL, USER, PASSWD);
             connection.setAutoCommit(false);
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-
-            // Prepare statement
             stmt = connection.createStatement();
 
+            // Ready, set, go!
+            for (String table : Arrays.asList("PROJA14.R1K", "PROJA14.R10K", "PROJA14.R100K", "PROJA14.R1000K")) {
+                System.out.println("~~~~~~~ " + table + " ~~~~~~~");
 
-            // Tables' names
-            String[] tables = { "R1K", "R10K", "R100K", "R1000K" };
+                /***************************************************************************************/
+                System.out.println("1. Full database mode");
+                System.out.print("COUNT DISTINCT FIBO:    ");
+                startTime = System.currentTimeMillis();
+                rs = stmt.executeQuery("SELECT COUNT (DISTINCT FIBO) FROM " + table);
+                rs.next();
+                System.out.println(rs.getInt(1) + getElapsedTime(startTime, System.currentTimeMillis()));
 
-            /* 1. SELECT - Full database mode */
+                System.out.print("R1.PK = 2 * R2.PK:      ");
+                startTime = System.currentTimeMillis();
+                rs = stmt.executeQuery("SELECT COUNT (*) FROM " + table + " R1, " + table + " R2 WHERE R1.PK = 2 * R2.PK");
+                rs.next();
+                System.out.println(rs.getInt(1) + getElapsedTime(startTime, System.currentTimeMillis()));
 
-            /* 2. SELECT - No database mode */
+                /***************************************************************************************/
+                System.out.println("2. No database mode");
+                System.out.print("COUNT DISTINCT FIBO:    ");
+                Set<Long> fibo = new HashSet<>();
 
-            /* 3. SELECT - Partial database mode */
+                // Getting results based on a cursor
+                stmt.setFetchSize(5000);
+                startTime = System.currentTimeMillis();
+                rs = stmt.executeQuery("SELECT * FROM " + table);
 
+                while (rs.next()) {
+                    fibo.add(rs.getLong("FIBO"));
+                }
+                System.out.println(fibo.size() + getElapsedTime(startTime, System.currentTimeMillis()));
 
+                System.out.print("R1.PK = 2 * R2.PK:      ");
+                Set<Integer> pks = new HashSet<>();
+                startTime = System.currentTimeMillis();
+                rs = stmt.executeQuery("SELECT * FROM " + table);
+
+                while (rs.next()) {
+                    pks.add(rs.getInt("PK"));
+                }
+                int total = 0;
+                for (int pk : pks) {
+                    total += pks.contains(pk * 2) ? 1 : 0;
+                }
+                System.out.println(total + getElapsedTime(startTime, System.currentTimeMillis()));
+
+                /***************************************************************************************/
+                System.out.println("3. Partial database mode");
+                System.out.print("COUNT DISTINCT FIBO:    ");
+                fibo = new HashSet<>();
+
+                startTime = System.currentTimeMillis();
+                rs = stmt.executeQuery("SELECT FIBO FROM " + table);
+
+                while (rs.next()) {
+                    fibo.add(rs.getLong(1));
+                }
+                System.out.println(fibo.size() + getElapsedTime(startTime, System.currentTimeMillis()));
+
+                System.out.print("R1.PK = 2 * R2.PK:      ");
+                pks = new HashSet<>();
+                startTime = System.currentTimeMillis();
+                rs = stmt.executeQuery("SELECT PK FROM " + table);
+
+                while (rs.next()) {
+                    pks.add(rs.getInt(1));
+                }
+                total = 0;
+                for (int pk : pks) {
+                    total += pks.contains(pk * 2) ? 1 : 0;
+                }
+                System.out.println(total + getElapsedTime(startTime, System.currentTimeMillis()));
+
+                // Turning off the cursor
+                stmt.setFetchSize(0);
+            }
         } catch (SQLException ex) {
+            System.out.println("Rolling back data...");
             ex.printStackTrace();
 
-            /* Catch all SQLExceptions and do rollbacks */
-            System.out.println("Rolling back data...");
             try {
                 if (connection != null)
                     connection.rollback();
@@ -75,7 +122,6 @@ public class Assignment03 {
         }
         finally {
             try {
-                /* Only commit after all updates and inserts have been successful */
                 if (connection != null)
                     connection.commit();
             } catch (SQLException ex) {
@@ -84,4 +130,18 @@ public class Assignment03 {
         }
     }
 
+    /** Calculates the elapsed time
+     *
+     * @param start time (milliseconds)
+     * @param end time (milliseconds)
+     * @return a formatted string with the elapsed time
+     */
+    private String getElapsedTime (long start, long end) {
+        long total = end - start;
+
+        return "\nElapsed time:   \t\t" +
+                (total >= 60000 ? (total / 1000 / 60) + "m, " + (total / 1000 % 60) + "s" : "") +
+                (total >= 1000 && total < 60000 ? (total / 1000) + "s, " + (total % 1000) + "ms" : "") +
+                (total < 1000 ? total + "ms" : "") + "\n";
+    }
 }
