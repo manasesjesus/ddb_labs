@@ -35,22 +35,17 @@ public class Assignment02 {
     protected void performTasks () {
         ResultSet rs = null;
         String SQL = "";
-        String column = "";
 
         System.out.println("Establishing DB connection...");
         try {
             // Establish connection
             connection = DriverManager.getConnection(URL, USER, PASSWD);
             connection.setAutoCommit(false);
+            //connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 
             // Prepare statement
             stmt = connection.createStatement();
-
-
-            /* Create a table definition using a text file */
-            /* Formulate integrity constraints and test */
-                // Created files assignment02.sql and assignment02-test.sql
-
+            
             /* Insert 1,000 10,000 and 100,000 tuples and name the tables R1K, R10K, R100K respectively */
             Map<String, Integer> tables = new HashMap<>();
 
@@ -71,47 +66,19 @@ public class Assignment02 {
 
                 SQL = "SELECT COUNT(col), COUNT(DISTINCT col), MAX(col), MIN(col) FROM " + table;
 
-                rs = stmt.executeQuery(SQL.replaceAll("col", column = "PK"));
-                rs.next();
-                System.out.format("%-10s \t %8d %7d %14d %7d \n", column, rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
-
-                rs = stmt.executeQuery(SQL.replaceAll("col", column = "CK1"));
-                rs.next();
-                System.out.format("%-10s \t %8d %7d %14d %7d \n", column, rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
-
-                rs = stmt.executeQuery(SQL.replaceAll("col", column = "FK"));
-                rs.next();
-                System.out.format("%-10s \t %8d %7d %14d %7d \n", column, rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
-
-                rs = stmt.executeQuery(SQL.replaceAll("col", column = "FIBO"));
-                rs.next();
-                System.out.format("%-10s \t %8d %7d %14d %7d \n", column, rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
-
-                rs = stmt.executeQuery(SQL.replaceAll("col", column = "GV100"));
-                rs.next();
-                System.out.format("%-10s \t %8d %7d %14d %7d \n", column, rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
-
-                rs = stmt.executeQuery(SQL.replaceAll("col", column = "GV10000"));
-                rs.next();
-                System.out.format("%-10s \t %8d %7d %14d %7d \n", column, rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
-
-                rs = stmt.executeQuery(SQL.replaceAll("col", column = "UV30"));
-                rs.next();
-                System.out.format("%-10s \t %8d %7d %14d %7d \n", column, rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
-
-                rs = stmt.executeQuery(SQL.replaceAll("col", column = "LV1000"));
-                rs.next();
-                System.out.format("%-10s \t %8d %7d %14d %7d \n", column, rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
+                for (String column : Arrays.asList("PK", "CK1", "FK", "FIBO", "GV100", "GV10000", "UV30", "LV1000")) {
+                    rs = stmt.executeQuery(SQL.replaceAll("col", column));
+                    rs.next();
+                    System.out.format("%-10s \t %8d %7d %14d %7d \n", column, rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4));
+                }
 
                 SQL = "SELECT COUNT(col), COUNT(DISTINCT col) FROM " + table;
 
-                rs = stmt.executeQuery(SQL.replaceAll("col", column = "STADT100"));
-                rs.next();
-                System.out.format("%-10s \t %8d %7d \n", column, rs.getInt(1), rs.getInt(2));
-
-                rs = stmt.executeQuery(SQL.replaceAll("col", column = "DAT100"));
-                rs.next();
-                System.out.format("%-10s \t %8d %7d \n", column, rs.getInt(1), rs.getInt(2));
+                for (String column : Arrays.asList("STADT100", "DAT100")) {
+                    rs = stmt.executeQuery(SQL.replaceAll("col", column));
+                    rs.next();
+                    System.out.format("%-10s \t %8d %7d \n", column, rs.getInt(1), rs.getInt(2));
+                }
             }
 
         } catch (SQLException | IOException ex) {
